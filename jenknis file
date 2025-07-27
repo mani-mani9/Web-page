@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/mani-mani9/Web-page.git'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    // Remove old image if exists
+                    sh 'docker rmi agri1 || true'
+                    
+                    // Build the Docker image
+                    docker.build('agri1')
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    // Remove existing container if any
+                    sh 'docker rm -f agri-container || true'
+                    
+                    // Run the new container
+                    sh 'docker run -d --name agri-container -p 8081:80 agri1'
+                }
+            }
+        }
+    }
+}
